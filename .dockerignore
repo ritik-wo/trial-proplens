@@ -1,0 +1,19 @@
+# Git
+.git
+
+# node_modules
+node_modules
+
+# Next.js build output
+.next
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cypress testing folder
+cypress
+
+# Docker
+Dockerfile

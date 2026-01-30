@@ -1,0 +1,19 @@
+/* Custom fonts disabled - using system fonts for now */
+/* Uncomment when Chronicle and Ringside fonts are available */
+
+/*
+@font-face {
+  font-family: 'Chronicle';
+  src: url('/fonts/Chronicle.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ringside';
+  src: url('/fonts/Ringside.woff2') format('woff2');
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+*/
