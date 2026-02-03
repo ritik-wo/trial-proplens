@@ -26,7 +26,7 @@ export function AppSidebar() {
   const [historyQ, setHistoryQ] = React.useState('');
   const [historySelectedId, setHistorySelectedId] = React.useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = React.useState(false);
-  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || 'static-user' : 'static-user';
+  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || '67fe0defb1bb16718f027aab' : '67fe0defb1bb16718f027aab';
   const isMarketRoute = pathname?.startsWith('/market-transaction');
   const [historyMode, setHistoryMode] = React.useState<'ask-buddy' | 'market-transaction'>(isMarketRoute ? 'market-transaction' : 'ask-buddy');
   const [clientReady, setClientReady] = React.useState(false);

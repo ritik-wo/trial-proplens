@@ -43,7 +43,7 @@ export function ChatPage({
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || 'static-user' : 'static-user';
+  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || '67fe0defb1bb16718f027aab' : '67fe0defb1bb16718f027aab';
   const derivedSessionId = `session_${Date.now()}`;
   (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()));
   const router = useRouter();

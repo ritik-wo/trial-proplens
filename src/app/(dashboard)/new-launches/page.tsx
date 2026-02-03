@@ -12,20 +12,20 @@ import { mocks } from '@/lib/mocks';
 import { UrlSection } from '@/components/blocks/UrlSection';
 type LaunchItem = { id: string; name: string; createdAt: string };
 
-export default function NewLaunches(){
+export default function NewLaunches() {
   const toast = useToast();
   const [launches, setLaunches] = React.useState<LaunchItem[]>([
-    { id: 'nl1', name: 'The Sen', createdAt: '2025-08-15' },
-    { id: 'nl2', name: 'Skye at Holland', createdAt: '2025-08-15' },
+    { id: 'nl1', name: 'Damac Bay By Cavalli', createdAt: '2025-08-15' },
+    { id: 'nl2', name: 'Bay Grove Residences', createdAt: '2025-08-15' },
   ]);
   const [link, setLink] = React.useState('https://example.com/project-launch');
 
-  const [openDelete, setOpenDelete] = React.useState<string|null>(null);
+  const [openDelete, setOpenDelete] = React.useState<string | null>(null);
   const [viewOpen, setViewOpen] = React.useState(false);
   const [viewProject, setViewProject] = React.useState<DetailProject | null>(null);
 
   const [reportsTick, setReportsTick] = React.useState(0);
-  const reports = React.useMemo(()=> mocks.presentations.slice(0, 1), [reportsTick]);
+  const reports = React.useMemo(() => mocks.presentations.slice(0, 1), [reportsTick]);
   return (
     <div>
       <PageHeader subtitle="Manage latest market updates on new launches and transaction trends" subtitleClassName="text-[--color-neutral-900]" />
@@ -41,10 +41,10 @@ export default function NewLaunches(){
           }
         >
           <div className="mt-6">
-            <FileUploadCustom onFilesSelected={(files)=>{
-              const now = new Date().toISOString().slice(0,10);
-              const items = Array.from(files).map((f)=>({ id: `${Date.now()}-${f.name}`, name: f.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g,' '), createdAt: now }));
-              setLaunches(prev=>[...prev, ...items]);
+            <FileUploadCustom onFilesSelected={(files) => {
+              const now = new Date().toISOString().slice(0, 10);
+              const items = Array.from(files).map((f) => ({ id: `${Date.now()}-${f.name}`, name: f.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' '), createdAt: now }));
+              setLaunches(prev => [...prev, ...items]);
               toast(`${files.length} file(s) added`);
             }} />
           </div>
@@ -56,7 +56,7 @@ export default function NewLaunches(){
           defaultValue={link}
           placeholder="https://example.com/project-launch"
           currentLabel="Current URL:"
-          onSave={(u)=>{ setLink(u); toast('Link saved'); }}
+          onSave={(u) => { setLink(u); toast('Link saved'); }}
         />
 
         <SectionCard title="Previously Uploaded Projects" description="New project launches already uploaded" titleClassName="font-semibold">
@@ -67,7 +67,7 @@ export default function NewLaunches(){
                 icon={<FolderIcon className="w-4 h-4" />}
                 title={p.name}
                 meta={`Created: ${p.createdAt}`}
-                onView={()=>{
+                onView={() => {
                   const proj: DetailProject = {
                     title: p.name,
                     createdAt: p.createdAt,
@@ -79,7 +79,7 @@ export default function NewLaunches(){
                   setViewProject(proj);
                   setViewOpen(true);
                 }}
-                onDelete={()=> setOpenDelete(p.id)}
+                onDelete={() => setOpenDelete(p.id)}
               />
             ))}
           </div>
@@ -95,7 +95,7 @@ export default function NewLaunches(){
           }
         >
           <div className="mt-4">
-            <FileUploadCustom onFilesSelected={(files)=>{
+            <FileUploadCustom onFilesSelected={(files) => {
               toast(`${files.length} file(s) selected for upload`);
             }} />
           </div>
@@ -109,10 +109,10 @@ export default function NewLaunches(){
                 icon={<TrendingUpIcon className="w-4 h-4 text-[--color-primary]" />}
                 title={r.name}
                 meta={`Uploaded: ${r.uploadedAt} • ${r.sizeMB} MB`}
-                onView={()=> toast('Preview not implemented in mock') }
-                onDelete={()=> {
+                onView={() => toast('Preview not implemented in mock')}
+                onDelete={() => {
                   mocks.removePresentation(r.id);
-                  setReportsTick(t=>t+1);
+                  setReportsTick(t => t + 1);
                   toast('Report removed');
                 }}
               />
@@ -123,18 +123,18 @@ export default function NewLaunches(){
 
       <ConfirmDeleteDialog
         open={!!openDelete}
-        onOpenChange={(b)=> !b && setOpenDelete(null)}
+        onOpenChange={(b) => !b && setOpenDelete(null)}
         title="Delete item?"
         description="This removes the project from previously uploaded launches."
-        onConfirm={()=>{
-          if(!openDelete) return;
-          setLaunches(prev=> prev.filter(p=>p.id !== openDelete));
+        onConfirm={() => {
+          if (!openDelete) return;
+          setLaunches(prev => prev.filter(p => p.id !== openDelete));
           setOpenDelete(null);
           toast('Item deleted');
         }}
       />
 
-      <ProjectDetailModal open={viewOpen} onClose={()=>setViewOpen(false)} project={viewProject} />
+      <ProjectDetailModal open={viewOpen} onClose={() => setViewOpen(false)} project={viewProject} />
     </div>
   );
 }

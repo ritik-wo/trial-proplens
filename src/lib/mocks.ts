@@ -1,7 +1,7 @@
 import { CompetitorProject, Presentation, Project, DetailedProject } from './types';
 export const DEFAULT_PROJECTS: DetailedProject[] = [
   {
-    title: 'Sobha Hartland II',
+    title: 'Sobha Coastline Beach Residences',
     url: '#',
     videos: [],
     coordinates: '',
@@ -9,7 +9,23 @@ export const DEFAULT_PROJECTS: DetailedProject[] = [
     createdAt: '2025-08-15'
   },
   {
-    title: 'Sobha One',
+    title: 'Sobha Elwood Estates',
+    url: '#',
+    videos: [],
+    coordinates: '',
+    documents: [],
+    createdAt: '2025-08-15'
+  },
+  {
+    title: 'Sobha Skyvue Solair',
+    url: '#',
+    videos: [],
+    coordinates: '',
+    documents: [],
+    createdAt: '2025-08-15'
+  },
+  {
+    title: 'Sobha Waves Opulence',
     url: '#',
     videos: [],
     coordinates: '',
@@ -24,20 +40,32 @@ let _presentations: Presentation[] = [
   { id: 'pr2', name: 'Portfolio Showcase', sizeMB: 8.7, uploadedAt: '2025-08-15' }
 ];
 let _competitors: CompetitorProject[] = [
-  { id: 'c1', name: 'Emaar Beachfront', createdAt: '2025-08-15' },
-  { id: 'c2', name: 'Damac Lagoons', createdAt: '2025-08-15' }
+  { id: 'c1', name: 'Damac Bay By Cavalli', createdAt: '2025-08-15' },
+  { id: 'c2', name: 'Bay Grove Residences', createdAt: '2025-08-15' },
+  { id: 'c3', name: 'Beachgate by Address', createdAt: '2025-08-15' },
+  { id: 'c4', name: 'Altiera Heights', createdAt: '2025-08-15' }
 ];
 type CompetitionDetail = { url?: string; coordinates?: string; documents?: { name: string; type?: string }[] };
 let _competitionDetails: Record<string, CompetitionDetail> = {
   c1: {
-    url: 'https://emaar.com',
-    coordinates: '25.0760, 55.1777',
-    documents: [{ name: 'Emaar_Brochure.pdf', type: 'PDF Document' }],
+    url: 'https://damacproperties.com',
+    coordinates: '25.1000, 55.1500',
+    documents: [{ name: 'Damac_Bay_Brochure.pdf', type: 'PDF Document' }],
   },
   c2: {
-    url: 'https://damacproperties.com',
-    coordinates: '25.1000, 55.2000',
-    documents: [{ name: 'Damac_Brochure.pdf', type: 'PDF Document' }],
+    url: 'https://nakheel.com',
+    coordinates: '25.0800, 55.1400',
+    documents: [{ name: 'Bay_Grove_Brochure.pdf', type: 'PDF Document' }],
+  },
+  c3: {
+    url: 'https://emaar.com',
+    coordinates: '25.0700, 55.1300',
+    documents: [{ name: 'Beachgate_Brochure.pdf', type: 'PDF Document' }],
+  },
+  c4: {
+    url: 'https://example.com',
+    coordinates: '25.0600, 55.1200',
+    documents: [{ name: 'Altiera_Brochure.pdf', type: 'PDF Document' }],
   },
 };
 

@@ -23,7 +23,7 @@ export function MobileSheet() {
   const [historyQ, setHistoryQ] = React.useState('');
   const [historySelectedId, setHistorySelectedId] = React.useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = React.useState(false);
-  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || 'static-user' : 'static-user';
+  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || '67fe0defb1bb16718f027aab' : '67fe0defb1bb16718f027aab';
 
   type HistoryMessage = { id: string; role: 'user' | 'assistant'; content: string; time: string };
   type HistoryConversation = { id: string; title: string; subtitle: string; createdAt: string | null; messages?: HistoryMessage[] };

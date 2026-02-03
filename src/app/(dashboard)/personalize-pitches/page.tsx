@@ -73,7 +73,7 @@ export default function Page() {
     onFinal: (text) => setValue('notes', text, { shouldDirty: true }),
   });
 
-  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || 'static-user' : 'static-user';
+  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || '67fe0defb1bb16718f027aab' : '67fe0defb1bb16718f027aab';
   const [submitting, setSubmitting] = React.useState(false);
   const [loadingText, setLoadingText] = React.useState('Generating...');
 
