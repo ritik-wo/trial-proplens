@@ -10,6 +10,7 @@ import { ChevronDown, Menu, X, MessageSquare, Calendar, Plus } from 'lucide-reac
 import type { Route } from 'next';
 
 import { buddyApi } from '@/lib/api';
+import { ALLOWED_USERS } from '@/lib/mocks';
 
 export function MobileSheet() {
   const [open, setOpen] = React.useState(false);
@@ -23,7 +24,7 @@ export function MobileSheet() {
   const [historyQ, setHistoryQ] = React.useState('');
   const [historySelectedId, setHistorySelectedId] = React.useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = React.useState(false);
-  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || '67fe0defb1bb16718f027aab' : '67fe0defb1bb16718f027aab';
+  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || ALLOWED_USERS[2].id : ALLOWED_USERS[2].id;
 
   type HistoryMessage = { id: string; role: 'user' | 'assistant'; content: string; time: string };
   type HistoryConversation = { id: string; title: string; subtitle: string; createdAt: string | null; messages?: HistoryMessage[] };

@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import type { Route } from 'next';
 import { useAuthRole } from "@/components/providers/AuthRoleProvider";
+import { ALLOWED_USERS } from "@/lib/mocks";
 
 interface Login2Props {
   heading?: string;
@@ -22,35 +23,7 @@ interface Login2Props {
   signupUrl?: string;
 }
 
-const ALLOWED_USERS = [
-  {
-    id: "6719dd78f21ef7a8b05e28a0",
-    name: "Admin",
-    email: "admin@proplens.ai",
-    password: "Win4CDL",
-    role: "admin",
-    org_id: "6645dc2f76aefc4f72970f05",
-    firstLogin: true
-  },
-  {
-    id: "673add3a08735de82e80bc09",
-    name: "Proplens Admin",
-    email: "proplens.admin@proplens.ai",
-    password: "Win4CDL",
-    role: "client_super_admin",
-    org_id: "6645dc2f76aefc4f72970f05",
-    firstLogin: true
-  },
-  {
-    id: "67fe0defb1bb16718f027aab",
-    name: "Test",
-    email: "test.trial@proplens.ai",
-    password: "Win4CDL",
-    role: "client_sales_user",
-    org_id: "6645dc2f76aefc4f72970f05",
-    firstLogin: false
-  }
-];
+
 
 const Login2 = ({
   heading = "Login",

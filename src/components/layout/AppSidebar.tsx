@@ -12,6 +12,7 @@ import { ConfirmDeleteDialog } from '@/components/feedback/ConfirmDeleteDialog';
 import { tokenService } from '@/lib/api/tokenService';
 import { Input } from '@/components/ui/Input';
 import { buddyApi } from '@/lib/api';
+import { ALLOWED_USERS } from '@/lib/mocks';
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -26,7 +27,7 @@ export function AppSidebar() {
   const [historyQ, setHistoryQ] = React.useState('');
   const [historySelectedId, setHistorySelectedId] = React.useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = React.useState(false);
-  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || '67fe0defb1bb16718f027aab' : '67fe0defb1bb16718f027aab';
+  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || ALLOWED_USERS[2].id : ALLOWED_USERS[2].id;
   const isMarketRoute = pathname?.startsWith('/market-transaction');
   const [historyMode, setHistoryMode] = React.useState<'ask-buddy' | 'market-transaction'>(isMarketRoute ? 'market-transaction' : 'ask-buddy');
   const [clientReady, setClientReady] = React.useState(false);

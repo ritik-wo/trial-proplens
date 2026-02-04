@@ -356,3 +356,50 @@ export const HISTORY_CONVERSATIONS = [
     ]
   }
 ];
+
+
+//static users 
+export const ALLOWED_USERS = [
+  {
+    id: "6719dd78f21ef7a8b05e28a0",
+    name: "Admin",
+    email: "admin@proplens.ai",
+    password: "Win4Proplens",
+    role: "admin",
+    org_id: "6645dc2f76aefc4f72970f05",
+    firstLogin: true,
+    projects: [],
+    phone: "9876543210"
+  },
+  {
+    id: "673add3a08735de82e80bc09",
+    name: "Proplens Admin",
+    email: "proplens.admin@proplens.ai",
+    password: "Win4Proplens",
+    role: "client_super_admin",
+    org_id: "6645dc2f76aefc4f72970f05",
+    firstLogin: true,
+    projects: [
+      "e26bbf3b-3145-440d-9e2a-b35982de76ce",
+      "9493638b-2a93-454c-82d8-eb96bf050c1a",
+      "3063d555-3362-4a6b-b0f2-1e1128da250d",
+      "general"
+    ],
+    phone: "9876543210"
+  },
+  {
+    id: "67fe0defb1bb16718f027aab",
+    name: "Test",
+    email: "test.trial@proplens.ai",
+    password: "Win4Proplens",
+    role: "client_sales_user",
+    org_id: "6645dc2f76aefc4f72970f05",
+    firstLogin: false,
+    projects: [
+      "7f921e0e-65a1-4be7-91f7-3a5bf23236ba",
+      "f4ff40cd-6b56-4204-aa37-f75fd9e7b9b5",
+      "ce0caf7e-8309-435a-b8f8-7d1a78e654fa"
+    ],
+    phone: "9876543210"
+  }
+];

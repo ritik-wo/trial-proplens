@@ -52,8 +52,8 @@ export const buddyApi = {
         typeof raw === 'string'
           ? raw
           : (raw && typeof raw === 'object' && typeof raw._id === 'string'
-              ? raw._id
-              : null);
+            ? raw._id
+            : null);
 
       return {
         data: {
@@ -82,8 +82,8 @@ export const buddyApi = {
         typeof raw === 'string'
           ? raw
           : (raw && typeof raw === 'object' && typeof raw._id === 'string'
-              ? raw._id
-              : null);
+            ? raw._id
+            : null);
 
       return {
         data: {

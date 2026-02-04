@@ -7,6 +7,7 @@ import { buddyApi } from '@/lib/api';
 import { useToast } from '@/components/providers/UiProviders';
 import { useSpeechRecognition } from '@/lib/hooks/useSpeechRecognition';
 import { ChatInput } from '@/components/blocks/ChatInput';
+import { ALLOWED_USERS } from '@/lib/mocks';
 
 export interface ChatPageProps {
   title: string;
@@ -43,9 +44,8 @@ export function ChatPage({
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || '67fe0defb1bb16718f027aab' : '67fe0defb1bb16718f027aab';
-  const derivedSessionId = `session_${Date.now()}`;
-  (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()));
+  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || ALLOWED_USERS[2].id : ALLOWED_USERS[2].id;
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -149,6 +149,7 @@ export function ChatPage({
       }
       lastHistoryIdRef.current = initialHistoryConversationId;
       setConversationId(chat._id || chat.id || null);
+      if (chat.sessionId) setSessionId(chat.sessionId);
       setLastChatId(initialHistoryConversationId);
 
       const serverMessages: any[] = Array.isArray(chat.messages) ? [...chat.messages] : [];
@@ -315,6 +316,8 @@ export function ChatPage({
     lastUserIdRef.current = userId;
     lastTextRef.current = text;
 
+    let activeSessionId = sessionId;
+    let activeUserId = authUserId;
     let chatId = conversationId;
     if (!chatId) {
       const { data, error } =
@@ -347,6 +350,15 @@ export function ChatPage({
           });
       if (data && data.chat_id) {
         chatId = data.chat_id;
+        if (data.raw) {
+          if (data.raw.sessionId) {
+            activeSessionId = data.raw.sessionId;
+            setSessionId(data.raw.sessionId);
+          }
+          if (data.raw.user_id) {
+            activeUserId = data.raw.user_id;
+          }
+        }
         setConversationId(data.chat_id);
 
         try {
@@ -383,19 +395,19 @@ export function ChatPage({
       mode === 'market-transaction'
         ? await buddyApi.runMarketTransaction({
           chat_id: chatId!,
-          user_id: authUserId!,
+          user_id: activeUserId!,
           query_id: queryId,
-          sessionId: derivedSessionId,
+          sessionId: activeSessionId!,
           query: trimmed,
           market_name: marketName || 'singapore',
           transaction_type: transactionType || 'default-transaction',
         })
         : await buddyApi.runUserQuery({
           chat_id: chatId!,
-          user_id: authUserId!,
+          user_id: activeUserId!,
           query: trimmed,
           query_id: queryId,
-          sessionId: derivedSessionId,
+          sessionId: activeSessionId!,
         });
 
     thinkingActiveRef.current[thinkingId] = false;
