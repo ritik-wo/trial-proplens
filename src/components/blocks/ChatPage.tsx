@@ -316,8 +316,9 @@ export function ChatPage({
     lastUserIdRef.current = userId;
     lastTextRef.current = text;
 
-    let activeSessionId = sessionId ?? (crypto.randomUUID?.() ?? String(Date.now()));
-    if (!sessionId) {
+    let activeSessionId = sessionId;
+    if (!activeSessionId) {
+      activeSessionId = crypto.randomUUID?.() ?? String(Date.now());
       setSessionId(activeSessionId);
     }
     let activeUserId = authUserId;
@@ -555,7 +556,7 @@ export function ChatPage({
         )}
       </div>
 
-      {messages.length > 0 && conversationId && (
+      {messages.length > 0 && (
         <div
           className={
             `fixed bottom-0 left-0 right-0 md:left-56 px-4 md:px-6 pt-4 pb-6 bg-white border-t border-[--color-neutral-200]`

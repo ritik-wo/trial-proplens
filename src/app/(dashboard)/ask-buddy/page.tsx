@@ -16,10 +16,10 @@ export default function AskBuddy() {
       thinkingIntro="Understanding your query"
       thinkingMid="Looking up information for you"
       suggestedQuestions={[
-        'Give me units in Sobha One with 1200 sq ft area & price under 3M AED.',
-        "What's the price range and psf range for 2-bed units in Sobha Hartland II?",
-        "How is Sobha One better than Emaar Beachfront for investment?",
-        "What's the unit availability at Sobha SeaHaven? Give me the payment plan.",
+        'What are the hospitals located near Sobha Coastline Beach Residences?',
+        'What are the registration fees for buying a property in Dubai?',
+        'Compare the amenities of Sobha Elwood and Skyvue Solair, focusing on fitness and recreational spaces.',
+        'How is Sobha Coastline Beach better than Skyvue Solair in terms of access to healthcare and schools?',
       ]}
 
       initialHistoryConversationId={historyId}
