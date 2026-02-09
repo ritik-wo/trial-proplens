@@ -30,6 +30,7 @@ export function MobileSheet() {
   type HistoryConversation = { id: string; title: string; subtitle: string; createdAt: string | null; messages?: HistoryMessage[] };
   const [historyConversations, setHistoryConversations] = React.useState<HistoryConversation[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = React.useState(false);
+  const lastFetchedPathRef = React.useRef<string | null>(null);
   const preferredHistoryId = React.useMemo(() => {
     if (!historyConversations.length) return null;
     const validIds = new Set(historyConversations.map(c => c.id));
@@ -50,16 +51,22 @@ export function MobileSheet() {
     } catch { }
   };
 
-  const fetchHistory = React.useCallback(async () => {
+  const fetchHistory = React.useCallback(async (forceRefetch = false) => {
     if (!authUserId) return;
-    let cancelled = false;
+    const isMarket = pathname?.startsWith('/market-transaction');
+    const currentPath = isMarket ? 'market' : 'buddy';
+
+    // Skip if already fetched for this path type
+    if (!forceRefetch && lastFetchedPathRef.current === currentPath && historyConversations.length > 0) return;
+    lastFetchedPathRef.current = currentPath;
+
     setIsHistoryLoading(true);
+    setHistoryConversations([]);
     try {
-      const isMarket = pathname?.startsWith('/market-transaction');
       const { data, error } = isMarket
         ? await buddyApi.getMarketChats(authUserId)
         : await buddyApi.getChats(authUserId);
-      if (cancelled || !data || error) return;
+      if (!data || error) return;
       const mapped: HistoryConversation[] = data
         .map((chat: any, idx: number) => {
           const id = (chat && (chat._id || chat.id)) || String(idx);
@@ -81,16 +88,15 @@ export function MobileSheet() {
     } finally {
       setIsHistoryLoading(false);
     }
-    return () => { cancelled = true; };
-  }, [authUserId, pathname]);
+  }, [authUserId, pathname]); // Keep pathname to get current route context
 
   React.useEffect(() => {
     void fetchHistory();
   }, [fetchHistory]);
 
   React.useEffect(() => {
-    const onNewChat = () => { void fetchHistory(); };
-    const onChatUpdated = () => { void fetchHistory(); };
+    const onNewChat = () => { void fetchHistory(true); }; // Force refetch
+    const onChatUpdated = () => { void fetchHistory(true); }; // Force refetch
     window.addEventListener('chat:new', onNewChat as EventListener);
     window.addEventListener('chat:updated', onChatUpdated as EventListener);
     return () => {

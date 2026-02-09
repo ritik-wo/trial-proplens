@@ -149,7 +149,7 @@ export function ChatPage({
       }
       lastHistoryIdRef.current = initialHistoryConversationId;
       setConversationId(chat._id || chat.id || null);
-      if (chat.sessionId) setSessionId(chat.sessionId);
+      setSessionId(crypto.randomUUID?.() ?? String(Date.now()));
       setLastChatId(initialHistoryConversationId);
 
       const serverMessages: any[] = Array.isArray(chat.messages) ? [...chat.messages] : [];
@@ -316,7 +316,10 @@ export function ChatPage({
     lastUserIdRef.current = userId;
     lastTextRef.current = text;
 
-    let activeSessionId = sessionId;
+    let activeSessionId = sessionId ?? (crypto.randomUUID?.() ?? String(Date.now()));
+    if (!sessionId) {
+      setSessionId(activeSessionId);
+    }
     let activeUserId = authUserId;
     let chatId = conversationId;
     if (!chatId) {
@@ -351,10 +354,6 @@ export function ChatPage({
       if (data && data.chat_id) {
         chatId = data.chat_id;
         if (data.raw) {
-          if (data.raw.sessionId) {
-            activeSessionId = data.raw.sessionId;
-            setSessionId(data.raw.sessionId);
-          }
           if (data.raw.user_id) {
             activeUserId = data.raw.user_id;
           }

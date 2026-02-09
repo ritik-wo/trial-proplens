@@ -35,6 +35,7 @@ export function AppSidebar() {
 
   const [historyConversations, setHistoryConversations] = React.useState<HistoryConversation[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = React.useState(false);
+  const lastFetchedModeRef = React.useRef<'ask-buddy' | 'market-transaction' | null>(null);
   const preferredHistoryId = React.useMemo(() => {
     if (!historyConversations.length) return null;
     const validIds = new Set(historyConversations.map(c => c.id));
@@ -65,16 +66,18 @@ export function AppSidebar() {
     setClientReady(true);
   }, []);
 
-  const fetchHistory = React.useCallback(async (overrideMode?: 'ask-buddy' | 'market-transaction') => {
+  const fetchHistory = React.useCallback(async (modeToUse: 'ask-buddy' | 'market-transaction') => {
     if (!authUserId) return;
-    let cancelled = false;
+    if (lastFetchedModeRef.current === modeToUse && historyConversations.length > 0) return;
+    lastFetchedModeRef.current = modeToUse;
+
     setIsHistoryLoading(true);
+    setHistoryConversations([]);
     try {
-      const modeToUse = overrideMode || historyMode;
       const { data, error } = modeToUse === 'market-transaction'
         ? await buddyApi.getMarketChats(authUserId)
         : await buddyApi.getChats(authUserId);
-      if (cancelled || !data || error) return;
+      if (!data || error) return;
       const mapped: HistoryConversation[] = data
         .map((chat: any, idx: number) => {
           const id = (chat && (chat._id || chat.id)) || String(idx);
@@ -96,32 +99,32 @@ export function AppSidebar() {
     } finally {
       setIsHistoryLoading(false);
     }
-    return () => { cancelled = true; };
-  }, [authUserId, historyMode]);
+  }, [authUserId]); 
 
   React.useEffect(() => {
-    // sync mode with route on route change
-    setHistoryMode(pathname?.startsWith('/market-transaction') ? 'market-transaction' : 'ask-buddy');
-  }, [pathname]);
+    const newMode = pathname?.startsWith('/market-transaction') ? 'market-transaction' : 'ask-buddy';
+    setHistoryMode(newMode);
+    if (lastFetchedModeRef.current !== newMode) {
+      void fetchHistory(newMode);
+    }
+  }, [pathname, fetchHistory]);
 
   React.useEffect(() => {
-    // initial and mode-change based fetch with visible loading
-    setIsHistoryLoading(true);
-    setHistoryConversations([]);
-    void fetchHistory();
-  }, [fetchHistory, historyMode]);
-
-  React.useEffect(() => {
-    // re-fetch when a new chat is initiated via plus button on the same route
-    const onNewChat = () => { void fetchHistory(); };
-    const onChatUpdated = () => { void fetchHistory(); };
+    const onNewChat = () => {
+      lastFetchedModeRef.current = null; // Force refetch
+      void fetchHistory(historyMode);
+    };
+    const onChatUpdated = () => {
+      lastFetchedModeRef.current = null; // Force refetch
+      void fetchHistory(historyMode);
+    };
     window.addEventListener('chat:new', onNewChat as EventListener);
     window.addEventListener('chat:updated', onChatUpdated as EventListener);
     return () => {
       window.removeEventListener('chat:new', onNewChat as EventListener);
       window.removeEventListener('chat:updated', onChatUpdated as EventListener);
     };
-  }, [fetchHistory]);
+  }, [fetchHistory, historyMode]);
 
   const filteredHistory = React.useMemo(() => {
     const s = historyQ.trim().toLowerCase();
@@ -141,11 +144,9 @@ export function AppSidebar() {
 
   const handleNewChat = (chatType: 'ask-buddy' | 'market-transaction') => {
     const target = `/${chatType}` as Route;
-    // If already on the target route (no query change), signal ChatPage to reset
     if (pathname?.startsWith(target)) {
       try { window.dispatchEvent(new CustomEvent('chat:new', { detail: { mode: chatType } })); } catch { }
     }
-    // Clear persisted last-opened chat for this mode
     setLastChatId(chatType, null);
     router.push(target);
   };
@@ -179,13 +180,11 @@ export function AppSidebar() {
         {sections.map((section) => (
           <div key={section.id}>
             {singleSection ? (
-              // Render items directly without section title/chevron when only one section exists
               <div className="mt-1 space-y-1">
                 {section.items.map(it => {
                   const active = pathname === it.href || pathname?.startsWith(it.href + '/') || pathname?.startsWith(it.href + '?');
                   const Icon = it.Icon as React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
-                  // Check if this is a chat item that needs a + button
                   const isChatItem = it.label === 'Ask Buddy' || it.label === 'Transaction Data';
                   const chatType = it.label === 'Ask Buddy' ? 'ask-buddy' : 'market-transaction';
 
@@ -269,7 +268,7 @@ export function AppSidebar() {
                             <span className="flex items-center gap-1">
                               <button
                                 type="button"
-                                onClick={(e) => { e.stopPropagation(); setIsHistoryLoading(true); setHistoryConversations([]); setHistoryMode('ask-buddy'); void fetchHistory('ask-buddy'); }}
+                                onClick={(e) => { e.stopPropagation(); lastFetchedModeRef.current = null; setHistoryMode('ask-buddy'); void fetchHistory('ask-buddy'); }}
                                 title="Show Ask Buddy history"
                                 aria-label="Show Ask Buddy history"
                                 className={`flex items-center justify-center w-6 h-6 rounded-md transition-colors ${historyMode === 'ask-buddy' ? 'bg-white/15 text-white' : 'text-[--color-neutral-400] hover:text-[--color-neutral-200] hover:bg-white/5'}`}
@@ -278,7 +277,7 @@ export function AppSidebar() {
                               </button>
                               <button
                                 type="button"
-                                onClick={(e) => { e.stopPropagation(); setIsHistoryLoading(true); setHistoryConversations([]); setHistoryMode('market-transaction'); void fetchHistory('market-transaction'); }}
+                                onClick={(e) => { e.stopPropagation(); lastFetchedModeRef.current = null; setHistoryMode('market-transaction'); void fetchHistory('market-transaction'); }}
                                 title="Show Transaction Data history"
                                 aria-label="Show Transaction Data history"
                                 className={`flex items-center justify-center w-6 h-6 rounded-md transition-colors ${historyMode === 'market-transaction' ? 'bg-white/15 text-white' : 'text-[--color-neutral-400] hover:text-[--color-neutral-200] hover:bg-white/5'}`}
