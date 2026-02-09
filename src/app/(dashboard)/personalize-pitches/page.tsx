@@ -20,7 +20,6 @@ marked.setOptions({ gfm: true, breaks: true });
 
 type Option = { value: string; label: string };
 
-// Build project options from seeded JSON file
 const PROJECTS: Option[] = (projectsData as any[]).map((p: any) => ({
   value: String(p._id ?? ''),
   label: String(p.name ?? ''),
@@ -65,7 +64,6 @@ export default function Page() {
   const pitchBoxRef = React.useRef<HTMLDivElement | null>(null);
   const [pitchBoxMinHeight, setPitchBoxMinHeight] = React.useState<number | null>(null);
   const editableRef = React.useRef<HTMLDivElement | null>(null);
-  // Voice input for notes: keep text in textarea, do not auto-send
   const { isListening, toggle: toggleMic } = useSpeechRecognition({
     lang: 'en-US',
     interim: true,
@@ -136,7 +134,6 @@ export default function Page() {
     if (submitting) return;
     setSubmitting(true);
     try {
-      // Map to API's required casing: type, stage should be labels; project_id is value; customer_name and query from form
       const typeLabel = PITCH_LENGTH.find(p => p.value === values.length)?.label || values.length;
       const stageLabel = PITCH_STAGE.find(s => s.value === values.stage)?.label || values.stage;
       const chatId = (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()));
@@ -146,7 +143,6 @@ export default function Page() {
       params.append('type', typeLabel);
       params.append('customer_name', values.customer || '');
       params.append('stage', stageLabel);
-      // Ensure we always send the project's _id (not name)
       const selectedProject = (projectsData as any[]).find((p: any) => String(p._id) === values.project || String(p.name) === values.project);
       const projectIdToSend = selectedProject ? String(selectedProject._id) : values.project;
       params.append('project_id', projectIdToSend);
@@ -158,7 +154,6 @@ export default function Page() {
 
       let text: string = '';
       if (typeof data === 'string') {
-        // Try to parse JSON string to extract pitch, else use as-is
         try {
           const parsed = JSON.parse(data);
           text = typeof parsed?.pitch === 'string' ? parsed.pitch : data;
@@ -325,7 +320,6 @@ export default function Page() {
           onOpenChange={(open) => {
             setDialogOpen(open);
             if (!open) {
-              // Reset TypedPitch and related UI state when dialog closes
               setPitch('');
               setTypingKey(0);
               setIsEditing(false);

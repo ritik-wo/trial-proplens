@@ -6,11 +6,9 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { getSectionsForRole } from '@/lib/roleMenu';
 import { useAuthRole } from '@/components/providers/AuthRoleProvider';
-import { ChevronDown, Menu, X, MessageSquare, Calendar, Plus } from 'lucide-react';
+import { ChevronDown, Menu, X, Plus } from 'lucide-react';
 import type { Route } from 'next';
-
-import { buddyApi } from '@/lib/api';
-import { ALLOWED_USERS } from '@/lib/mocks';
+import { ChatHistorySidebar } from './ChatHistorySidebar';
 
 export function MobileSheet() {
   const [open, setOpen] = React.useState(false);
@@ -21,23 +19,6 @@ export function MobileSheet() {
   const [openId, setOpenId] = React.useState<string | null>(sections[0]?.id ?? null);
   React.useEffect(() => { setOpenId(sections[0]?.id ?? null); }, [role]);
   const pathname = usePathname();
-  const [historyQ, setHistoryQ] = React.useState('');
-  const [historySelectedId, setHistorySelectedId] = React.useState<string | null>(null);
-  const [historyOpen, setHistoryOpen] = React.useState(false);
-  const authUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') || ALLOWED_USERS[2].id : ALLOWED_USERS[2].id;
-
-  type HistoryMessage = { id: string; role: 'user' | 'assistant'; content: string; time: string };
-  type HistoryConversation = { id: string; title: string; subtitle: string; createdAt: string | null; messages?: HistoryMessage[] };
-  const [historyConversations, setHistoryConversations] = React.useState<HistoryConversation[]>([]);
-  const [isHistoryLoading, setIsHistoryLoading] = React.useState(false);
-  const lastFetchedPathRef = React.useRef<string | null>(null);
-  const preferredHistoryId = React.useMemo(() => {
-    if (!historyConversations.length) return null;
-    const validIds = new Set(historyConversations.map(c => c.id));
-    if (historySelectedId && validIds.has(historySelectedId)) return historySelectedId;
-    return historyConversations[0]?.id || null;
-  }, [historySelectedId, historyConversations]);
-  const isMarketRoute = pathname?.startsWith('/market-transaction');
 
   const getLastChatKey = (mode: 'ask-buddy' | 'market-transaction') => `lastChatId:${mode}`;
   const getLastChatId = (mode: 'ask-buddy' | 'market-transaction') => {
@@ -51,74 +32,11 @@ export function MobileSheet() {
     } catch { }
   };
 
-  const fetchHistory = React.useCallback(async (forceRefetch = false) => {
-    if (!authUserId) return;
-    const isMarket = pathname?.startsWith('/market-transaction');
-    const currentPath = isMarket ? 'market' : 'buddy';
-
-    // Skip if already fetched for this path type
-    if (!forceRefetch && lastFetchedPathRef.current === currentPath && historyConversations.length > 0) return;
-    lastFetchedPathRef.current = currentPath;
-
-    setIsHistoryLoading(true);
-    setHistoryConversations([]);
-    try {
-      const { data, error } = isMarket
-        ? await buddyApi.getMarketChats(authUserId)
-        : await buddyApi.getChats(authUserId);
-      if (!data || error) return;
-      const mapped: HistoryConversation[] = data
-        .map((chat: any, idx: number) => {
-          const id = (chat && (chat._id || chat.id)) || String(idx);
-          const msgs = Array.isArray(chat.messages) ? chat.messages : [];
-          const firstMsg = msgs[0] as any | undefined;
-          const firstMsgText = firstMsg?.text || firstMsg?.content || '';
-          const title = chat.title || (firstMsgText ? firstMsgText.slice(0, 50) + (firstMsgText.length > 50 ? '...' : '') : `Chat ${idx + 1}`);
-          const lastMsg = msgs[msgs.length - 1] as any | undefined;
-          const subtitle = lastMsg?.text || lastMsg?.content || '';
-          const createdAt: string | null = chat.created_at || chat.createdAt || null;
-          return { id, title, subtitle, createdAt };
-        })
-        .sort((a, b) => {
-          const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return tb - ta;
-        });
-      setHistoryConversations(mapped);
-    } finally {
-      setIsHistoryLoading(false);
-    }
-  }, [authUserId, pathname]); // Keep pathname to get current route context
-
-  React.useEffect(() => {
-    void fetchHistory();
-  }, [fetchHistory]);
-
-  React.useEffect(() => {
-    const onNewChat = () => { void fetchHistory(true); }; // Force refetch
-    const onChatUpdated = () => { void fetchHistory(true); }; // Force refetch
-    window.addEventListener('chat:new', onNewChat as EventListener);
-    window.addEventListener('chat:updated', onChatUpdated as EventListener);
-    return () => {
-      window.removeEventListener('chat:new', onNewChat as EventListener);
-      window.removeEventListener('chat:updated', onChatUpdated as EventListener);
-    };
-  }, [fetchHistory]);
-
-  const formatDate = (iso: string) => {
-    const d = new Date(iso);
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yy = String(d.getFullYear()).slice(-2);
-    return `${dd}-${mm}-${yy}`;
-  };
-
   const handleNewChat = (chatType: 'ask-buddy' | 'market-transaction') => {
     const target = `/${chatType}` as Route;
     if (pathname?.startsWith(target)) {
       try { window.dispatchEvent(new CustomEvent('chat:new', { detail: { mode: chatType } })); } catch { }
     }
-    // Clear persisted last-opened chat for this mode on +
     setLastChatId(chatType, null);
     setOpen(false);
     router.push(target);
@@ -157,7 +75,6 @@ export function MobileSheet() {
                       const active = pathname?.startsWith(it.href);
                       const Icon = it.Icon as React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
-                      // Check if this is a chat item that needs a + button
                       const isChatItem = it.label === 'Ask Buddy' || it.label === 'Transaction Data';
                       const chatType = it.label === 'Ask Buddy' ? 'ask-buddy' : 'market-transaction';
 
@@ -189,6 +106,13 @@ export function MobileSheet() {
                               <Plus className="w-3.5 h-3.5" />
                             </button>
                           </div>
+                        );
+                      }
+
+                      // Use reusable ChatHistorySidebar for Chat History item
+                      if (it.label === 'Chat History') {
+                        return (
+                          <ChatHistorySidebar key={it.href} Icon={Icon} label={it.label} />
                         );
                       }
 
@@ -226,83 +150,10 @@ export function MobileSheet() {
 
                         if (it.label === 'Chat History') {
                           return (
-                            <div key={`${it.href}-history`} className="space-y-1">
-                              <button
-                                type="button"
-                                className={`group flex items-center justify-between px-2 h-9 rounded-xl text-xs transition-colors border-l-transparent w-full ${historyOpen
-                                  ? 'bg-white/10 border-l-2 border-white text-white font-medium'
-                                  : 'text-[--color-neutral-400] hover:bg-white/5 hover:text-[--color-neutral-200]'
-                                  }`}
-                                onClick={() => setHistoryOpen(v => !v)}
-                                aria-expanded={historyOpen}
-                              >
-                                <span className="flex items-center gap-2">
-                                  <Icon className={`${historyOpen ? 'text-white' : 'text-[--color-neutral-500] group-hover:text-[--color-neutral-300]'} w-4 h-4`} aria-hidden="true" />
-                                  <span className="whitespace-nowrap">{it.label}</span>
-                                </span>
-                                <ChevronDown className={`${historyOpen ? 'rotate-180' : ''} w-3 h-3 transition-transform text-[--color-neutral-400]`} />
-                              </button>
-
-                              {historyOpen && (
-                                <div className="pt-1 space-y-1 max-h-72 overflow-auto sidebar-scroll">
-                                  {isHistoryLoading && !historyConversations.length && (
-                                    <div className="px-2 py-1.5 text-[11px] text-[--color-neutral-500]">
-                                      Loading chats...
-                                    </div>
-                                  )}
-                                  {!isHistoryLoading && !historyConversations.length && (
-                                    <div className="px-2 py-1.5 text-[11px] text-[--color-neutral-500]">
-                                      No chats yet
-                                    </div>
-                                  )}
-                                  {historyConversations.map(c => {
-                                    const hActive = historySelectedId === c.id;
-                                    return (
-                                      <button
-                                        key={c.id}
-                                        type="button"
-                                        className={`group w-full text-left rounded-xl px-2 py-1.5 text-xs transition-colors ${hActive
-                                          ? 'bg-white/10 text-white'
-                                          : 'bg-transparent text-[--color-neutral-400] hover:bg-white/5 hover:text-[--color-neutral-200]'
-                                          }`}
-                                        onClick={() => {
-                                          setHistorySelectedId(c.id);
-                                          const basePath: Route = (isMarketRoute ? '/market-transaction' : '/ask-buddy') as Route;
-                                          router.push(`${basePath}?historyId=${c.id}` as Route);
-                                        }}
-                                      >
-                                        <div className="flex items-start gap-2">
-                                          <MessageSquare
-                                            className={`w-4 h-4 mt-0.5 ${hActive ? 'text-white' : 'text-[--color-neutral-500] group-hover:text-[--color-neutral-300]'}`}
-                                            aria-hidden="true"
-                                          />
-                                          <div className="min-w-0 flex-1 text-left">
-                                            <div className="flex items-center gap-1.5">
-                                              <div className={`b-font font-semibold text-[12px] truncate flex-1 ${hActive ? 'text-white' : 'text-[--color-neutral-100]'}`}>
-                                                {c.title}
-                                              </div>
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-[10px] mt-0.5">
-                                              <Calendar
-                                                className={`w-3.5 h-3.5 ${hActive ? 'text-[--color-neutral-200]' : 'text-[--color-neutral-500]'}`}
-                                                aria-hidden="true"
-                                              />
-                                              <span className={`${hActive ? 'text-[--color-neutral-200]' : 'text-[--color-neutral-500]'} truncate`}>
-                                                {c.createdAt ? formatDate(c.createdAt) : ''}
-                                              </span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </div>
+                            <ChatHistorySidebar key={it.href} Icon={Icon} label={it.label} />
                           );
                         }
 
-                        // Check if this is a chat item that needs a + button
                         const isChatItem = it.label === 'Ask Buddy' || it.label === 'Transaction Data';
                         const chatType = it.label === 'Ask Buddy' ? 'ask-buddy' : 'market-transaction';
 

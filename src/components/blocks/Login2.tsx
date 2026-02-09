@@ -64,7 +64,8 @@ const Login2 = ({
     localStorage.setItem('userName', user.name);
     localStorage.setItem('userRole', user.role);
     localStorage.setItem('userOrgId', user.org_id);
-    setRole(null);
+    // Set the role in context to the user's actual role
+    setRole(user.role as any);
     setIsRedirecting(true);
     router.push('/ask-buddy' as Route);
   };

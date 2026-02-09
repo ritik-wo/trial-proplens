@@ -17,7 +17,6 @@ export const authApi = {
     try {
       const response = await apiClient.post<LoginResponse>('/api/token/pair', data);
       
-      // Persist remember flag and tokens via tokenService
       localStorage.setItem('remember_me', String(rememberMe));
       const storage = tokenService.getStorage();
       storage.setItem('username', response.data.username);

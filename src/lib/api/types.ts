@@ -29,7 +29,6 @@ export interface RunAgentRequest {
 
 export interface RunAgentResponse {
   response: string;
-  // images?: string[];
 }
 
 export interface CreateConversationResponse {

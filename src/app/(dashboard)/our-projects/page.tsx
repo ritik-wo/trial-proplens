@@ -17,7 +17,7 @@ export default function OurProjectsPage() {
   const [showNew, setShowNew] = React.useState(false);
   const [tick, setTick] = React.useState(0);
   const show = useToast();
-  const projects = mocks.projects; // in-memory
+  const projects = mocks.projects;
   const [viewOpen, setViewOpen] = React.useState(false);
   const [viewProject, setViewProject] = React.useState<{ title: string; createdAt: string; url?: string; videos?: { label: string; url: string }[]; coordinates?: string; documents?: { name: string; type?: string }[] } | null>(null);
 

@@ -11,7 +11,7 @@ export interface UrlSectionProps {
   defaultValue?: string;
   placeholder?: string;
   onSave?: (url: string) => void;
-  currentLabel?: string; // e.g., "Current Website:"
+  currentLabel?: string;
   className?: string;
   titleClassName?: string;
 }

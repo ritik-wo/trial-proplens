@@ -95,7 +95,6 @@ export function ChatPage({
 
     if (!initialHistoryConversationId) {
       if (lastHistoryIdRef.current !== null) {
-        // We were previously on a chat with history, now switching to new chat
         lastHistoryIdRef.current = null;
         setConversationId(null);
         setMessages([]);

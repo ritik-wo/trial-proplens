@@ -9,7 +9,7 @@ import { useToast } from '@/components/providers/UiProviders';
 
 export default function Sops(){
   const show = useToast();
-  const [tick, setTick] = React.useState(0); // force re-render on mock changes
+  const [tick, setTick] = React.useState(0); 
 
   const sections = [
     {

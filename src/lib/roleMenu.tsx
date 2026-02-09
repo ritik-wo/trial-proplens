@@ -13,7 +13,7 @@ const conversation: MenuSection = {
     { href: '/ask-buddy', label: 'Ask Buddy', Icon: UserIcon },
     { href: '/market-transaction', label: 'Transaction Data', Icon: UserIcon },
     { href: '/personalize-pitches', label: 'Personalize Pitches', Icon: UsersIcon },
-    { href: '/ask-buddy', label: 'Chat History', Icon: FolderOpenIcon },
+    { href: '/chat-history', label: 'Chat History', Icon: FolderOpenIcon },
   ] as MenuItem[],
 };
 
@@ -29,7 +29,14 @@ const salesAdmin: MenuSection = {
   ] as MenuItem[],
 };
 
+// Admin roles that can access Sales Admin Panel
+const ADMIN_ROLES = ['admin', 'client_super_admin'];
+
 export function getSectionsForRole(role: UserRole): MenuSection[] {
-  // Testing: expose Sales Admin + Conversation sections for all roles
-  return [salesAdmin, conversation];
+  // Only admin and client_super_admin can see Sales Admin Panel
+  if (role && ADMIN_ROLES.includes(role)) {
+    return [salesAdmin, conversation];
+  }
+  // Other users (e.g., client_sales_user) only see Conversation Panel
+  return [conversation];
 }

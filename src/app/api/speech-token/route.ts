@@ -38,7 +38,6 @@ export async function GET() {
     const token = await response.text();
     const jsonResponse = NextResponse.json({ token, region: speechRegion });
 
-    // Add CORS headers
     jsonResponse.headers.set("Access-Control-Allow-Origin", "*");
     jsonResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     jsonResponse.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
